@@ -1,0 +1,67 @@
+---
+# tasks file for web
+
+- name: Instalacja serwera web - apache2
+  yum:
+    name: httpd
+    state: latest
+
+- name: Aktywowanie serwera apache2 przy uruchomieniu os
+  service:
+    name: httpd
+    state: started
+    enabled: true
+  notify: restart http
+
+- name: Instalacja epel
+  yum:
+    name: epel-release
+    state: latest
+
+- name: Instalacja
+  yum:
+    name: http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+    state: present
+
+- name: Instalacja yum utils
+  yum:
+    name: yum-utils
+    state: latest
+
+- name: Disable repo for php56
+  command: yum-config-manager --disable remi-php54
+
+- name: Enable repo for php7
+  command: yum-config-manager --enable remi-php73
+
+- name: Instalacja php
+  yum:
+    name: php
+    state: latest
+
+- name: Instalacja php-gd
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - php-gd
+    - php-pdo_mysql
+    - php-pdo
+    - php-zip
+    - php-xml
+  notify: restart http
+
+- name: Zmiana document root
+  replace: 
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '(^DocumentRoot\s)(.*)$'
+    replace: '\1"/data/gla/wordpress"'
+    backup: yes
+
+- name: Zmiana document root
+  replace:
+    path: /etc/httpd/conf/httpd.conf
+    regexp: '(^<Directory\s)(.*)$'
+    replace: '\1"/data/gla/wordpress">'
+    backup: yes
+

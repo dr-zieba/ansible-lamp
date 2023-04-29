@@ -1,0 +1,31 @@
+---
+# tasks file for lb
+
+- name: Instalacja haproxy
+  yum:
+    name: haproxy
+    state: latest
+
+- name: Aktywacja haproxy po starcie os
+  service:
+    name: haproxy
+    state: started
+    enabled: yes
+  notify: restart haproxy
+
+- name: Otwarcie portow 80/443 dla ruchu sieciowego
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: yes
+    state: enabled
+  with_items:
+    - 80
+    - 443
+  notify: restart firewalld
+
+- name: Kopiowanie pliku konfiguracyjnego
+  copy:
+    src: haproxy.cfg
+    dest: /etc/haproxy/
+    mode: '0644'
+  notify: restart haproxy

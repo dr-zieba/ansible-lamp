@@ -1,0 +1,51 @@
+---
+# tasks file for fdisk
+
+- name: Create a new primary partition
+  parted:
+    device: "/dev/{{ disk_name }}"
+    number: 1
+    state: present
+
+- name: Formatowanie do ext4 
+  filesystem:
+    fstype: ext4
+    dev: "/dev/{{ disk_name }}1"
+
+- name: Otwarcie portów 80/443
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: yes
+    state: enabled
+  with_items:
+  - 80
+  - 443
+  - 3306
+  - 22
+  - 111
+  - 2049
+  - 24007
+  - 24008
+  - 24010
+  - 38465
+  - 38466
+  - 38467
+  - 49152
+  - 49153
+  notify: restart firewalld
+
+- name: Stworznie katalgou dla brick
+  file:
+    path: /data/gla/
+    state: directory
+    owner: root
+    group: root
+    mode: 0775
+
+- name: Zamontowanie katalogu brick na partycji {{ disk_name }}.
+  mount:
+    path: /data/gla/
+    src: "/dev/{{ disk_name }}1"
+    fstype: ext4
+    state: mounted
+

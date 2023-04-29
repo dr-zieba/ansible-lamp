@@ -1,0 +1,6 @@
+---
+# vars file for db
+
+db_packages:
+  - mariadb-server
+  - MySQL-python

@@ -1,0 +1,21 @@
+---
+# vars file for prestashop
+
+prestashop_domain: "prestashop"
+prestashop_db_create: 1
+prestashop_db_clear: 1
+prestashop_db_server: 192.168.1.211
+prestashop_db_name: "prestashop"
+prestashop_db_user: "root"
+prestashop_db_password: "root"
+prestashop_db_engine: "MariaDB"
+prestashop_db_prefix: "ps_"
+prestashop_language: "es"
+prestashop_country: "es"
+prestashop_timezone: "Europe/Madrid"
+prestashop_newsletter: 0
+
+prestashop_firstname: "PrestaShop"
+prestashop_lastname: "Developer"
+prestashop_password: "p_prestashop"
+prestashop_email: "dev@prestashop.com"

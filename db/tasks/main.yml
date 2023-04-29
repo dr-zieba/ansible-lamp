@@ -1,0 +1,38 @@
+---
+# tasks file for db
+
+- name: Instalacja bazy danych mariadb
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items: "{{ db_packages }}"
+
+- name: Aktywacja bazy po starcie os
+  service:
+    name: mariadb
+    state: started
+    enabled: true
+  notify: restart db
+
+- name: Otwarcie portu dla bazy danych
+  firewalld:
+    port: "{{ item }}/tcp"
+    permanent: yes
+    state: enabled
+  with_items:
+    - 80
+    - 443
+    - 3306
+    - 22
+    - 111
+    - 2049
+    - 24007
+    - 24008
+    - 24010
+    - 38465
+    - 38466
+    - 38467
+    - 49152
+    - 49153
+  notify: restart firewalld 
+  

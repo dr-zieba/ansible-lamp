@@ -1,0 +1,22 @@
+---
+# tasks file for db_config
+
+- name: Stworzenie bazydanych
+  mysql_db:
+    name: wordpress 
+    collation: utf8mb4_general_ci
+    state: present
+
+- name: Utworzenie uzytkownika bazy danych
+  mysql_user:
+    name: wordpress
+    password: wordpress
+    priv: '*.*:ALL'
+    state: present
+    host: "{{ item }}"
+  with_items:
+    - 'localhost'
+    - '192.168.1.161'
+    - '192.168.1.151'
+    - '192.168.1.152'
+

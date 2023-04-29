@@ -1,0 +1,61 @@
+---
+# tasks file for wordpress
+
+- name: Utworzenie katalogu sandbox
+  file:
+    path: /home/sandbox
+    mode: '0755'
+    state: directory
+
+- name: Pobranie paczki wp
+  get_url:
+    url: https://pl.wordpress.org/wordpress-5.3.2-pl_PL.tar.gz
+    dest: /home/sandbox/
+    mode: '0777'
+
+- name: Stworzenie katalogu dla wp
+  file:
+    path: /mnt/www/wordpress
+    mode: '0777'
+    state: directory
+
+- name: Rozpakowanie paczki wp w sandbox
+  unarchive:
+    src: /home/sandbox/wordpress-5.3.2-pl_PL.tar.gz
+    dest: /home/sandbox/
+    mode: '0755'
+    remote_src: yes
+
+- name: Usunięcie pliku zip
+  file:
+    state: absent
+    path: /home/sandbox/wordpress-5.3.2-pl_PL.tar.gz
+
+- name: Kopiowanie z sandbox do /mnt/www/
+  command: cp -r /home/sandbox/wordpress/ /mnt/www/
+
+- name: Kopiowanie pliku wp-config.php
+  copy:
+    src: wp-config.php
+    dest: /mnt/www/wordpress/
+    mode: '0755'
+
+- name: Installacja mysql-python
+  yum:
+    name: MySQL-python 
+    state: latest
+
+- name: Kopiowanie pliku bazy
+  copy:
+    src: wordpress.sql
+    dest: /home/sandbox/
+    mode: '0755'
+
+- name: Import db
+  mysql_db:
+    state: import
+    name: wordpress
+    target: /home/sandbox/wordpress.sql
+    login_user: wordpress
+    login_password: wordpress
+    login_host: 192.168.1.161

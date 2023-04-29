@@ -1,0 +1,14 @@
+---
+# tasks file for gluster
+
+- name: Connect to Gluster peers.
+  shell: "gluster peer probe www2"
+
+- name: Create Gluster volume.
+  shell: "gluster volume create gv1 replica 2 www1:/data/gla www2:/data/gla force"
+  register: glvol
+  ignore_errors: True
+
+- name: Ensure Gluster volume is started.
+  shell: "gluster volume start gv1"
+  ignore_errors: True

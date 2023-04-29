@@ -1,0 +1,104 @@
+---
+# tasks file for woocommerce
+- name: Instalacja epel
+  yum:
+    name: epel-release
+    state: latest
+
+- name: Instalacja
+  yum:
+    name: http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+    state: present
+
+- name: Instalacja yum utils
+  yum:
+    name: yum-utils
+    state: latest
+
+- name: Disable repo for php56
+  command: yum-config-manager --disable remi-php54
+
+- name: Enable repo for php7
+  command: yum-config-manager --enable remi-php73
+
+- name: Instalacja php
+  yum:
+    name: php
+    state: latest
+
+- name: Instalacja php-gd
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - php-gd
+    - php-pdo_mysql
+    - php-pdo
+    - php-zip
+    - php-xml
+
+- name: Install WP-CLI
+  get_url:
+    url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    dest: /usr/bin/wp
+    mode: '0755'
+
+- name: Download Woocommerce
+  get_url:
+    url: https://downloads.wordpress.org/plugin/woocommerce.3.9.2.zip
+    dest: /home/sandbox/woocommerce.tar.gz
+    mode: '0755'
+
+- name: Download woocommerce-admin
+  get_url:
+    url: https://downloads.wordpress.org/plugin/woocommerce-admin.zip
+    dest: /home/sandbox/woocommerce-admin.tar.gz
+    mode: '0755'
+
+- name: Extract Woocommerce
+  unarchive:
+    src: /home/sandbox/woocommerce.tar.gz
+    dest: /mnt/www/wordpress/wp-content/plugins
+    remote_src: yes
+
+- name: Exctract woocemmerce-admin
+  unarchive:
+    src: /home/sandbox/woocommerce-admin.tar.gz
+    dest: /mnt/www/wordpress/wp-content/plugins
+    remote_src: yes
+
+- name: Activate WooCommerce
+  command: wp plugin activate woocommerce
+  args:
+    chdir: /mnt/www/wordpress/
+
+- name: Activae woocemmerce-admin
+  command: wp plugin activate woocommerce-admin
+  args:
+    chdir: /mnt/www/wordpress
+
+- name: Install eCommerce Theme
+  command: wp theme install flat-shop-lite --activate
+  args:
+    chdir: /mnt/www/wordpress
+
+- name: Kopiowanie pliku bazy
+  copy:
+    src: woocommerce.sql
+    dest: /home/sandbox/
+    mode: '0755'
+
+- name: Import db
+  mysql_db:
+    state: import
+    name: wordpress
+    target: /home/sandbox/woocommerce.sql
+    login_user: wordpress
+    login_password: wordpress
+    login_host: 192.168.1.161
+
+- name: Kopiowanie szablonu
+  copy:
+    src: flat-shop-lite
+    dest: /mnt/www/wordpress/wp-content/themes/
+    mode: '0755'

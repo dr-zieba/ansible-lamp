@@ -1,0 +1,7 @@
+---
+# handlers file for gluster_install
+
+- name: Restart gluster
+  service:
+    name: glusterd
+    state: restarted

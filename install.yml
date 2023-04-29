@@ -1,0 +1,44 @@
+---
+- hosts: all
+  become: True
+  gather_facts: True
+  roles:
+  - pretasks
+
+- hosts: www
+  become: True
+  gather_facts: True
+  roles:
+    - web
+    - fdisk
+    - gluster_install
+
+- hosts: www1
+  become: True
+  gather_facts: True
+  roles:
+    - gluster
+
+- hosts: data
+  become: True
+  gather_facts: True
+  roles:
+    - db
+    - db_config
+    - gluster_client
+
+- hosts: lb
+  become: True
+  gather_facts: True
+  roles:
+    - lb
+    - keepalive
+
+- hosts: data
+  become: True
+  gather_facts: True
+  roles:
+    - wordpress
+    - woocommerce
+
+...

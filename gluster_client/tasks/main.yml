@@ -1,0 +1,19 @@
+---
+# tasks file for gluster_client
+
+- name: Instalacja Gluser client
+  yum:
+    name: '{{ item }}'
+    state: latest
+  with_items:
+    - centos-release-gluster
+    - glusterfs-client
+
+- name: Stworzenie katalogu
+  file:
+    path: /mnt/www
+    mode: '0755'
+    state: directory
+
+- name: Zamontowanie gv1 do /mnt/www/.
+  command: mount -t glusterfs www1:/gv1 /mnt/www

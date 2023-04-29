@@ -1,0 +1,21 @@
+---
+# tasks file for gluster_install
+- name: Instalacja repo
+  yum:
+    name: centos-release-gluster
+    state: present
+
+- name: Instalacja glusterFS
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+    - glusterfs-server
+
+- name: Aktywowanie GlusterFS
+  service:
+    name: glusterd
+    state: started
+    enabled: true
+  notify: Restart gluster
+ 

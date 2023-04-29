@@ -1,0 +1,6 @@
+---
+# handlers file for keepalive
+- name: restart keepalive
+  service:
+    name: keepalived
+    state: restarted

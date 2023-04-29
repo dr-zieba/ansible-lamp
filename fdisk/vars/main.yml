@@ -1,0 +1,3 @@
+---
+# vars file for fdisk
+disk_name: sdb

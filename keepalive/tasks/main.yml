@@ -1,0 +1,41 @@
+---
+# tasks file for keepalive
+- name: Dodanie wpisu w /etc/sysctl
+  lineinfile:
+    dest: /etc/sysctl
+    line: "{{ item }}"
+    state: present
+  with_items:
+    - "net.ipv4.ip_nonlocal_bind=1"
+    - "net.ipv4.ip_forward=1"
+
+- name: Instalacja pakietow
+  yum:
+    name: "{{ item }}"
+    state: latest
+  with_items:
+  - gcc
+  - kernel-headers 
+  - kernel-devel
+  - keepalived
+
+- name: Aktywowanie keepalive po  uruchomieniu os
+  service:
+    name: keepalived
+    state: started
+    enabled: true
+
+- name: zmienna lb1
+  include_vars: lb1.yml
+  when: ansible_enp0s3.ipv4.address=="192.168.1.171"
+
+- name: zmiennalb2
+  include_vars: lb2.yml
+  when: ansible_enp0s3.ipv4.address=="192.168.1.172"
+
+- name: Kopiowanie cfg
+  template:
+    src: keepalived.conf.j2
+    dest: /etc/keepalived/keepalived.conf
+    mode: '0644'
+  notify: restart keepalive
